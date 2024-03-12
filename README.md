@@ -1,6 +1,5 @@
 # TrackerApp
 
-a
 
 ## Getting started
 
