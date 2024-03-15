@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,13 +24,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.trackerapp.ui.theme.PrimaryGreen
 import com.example.trackerapp.ui.theme.PrimaryOrange
+import kotlinx.coroutines.delay
 
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(
+    onRegisterSuccess: () -> Unit
+) {
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
-    val screenHeight = configuration.screenHeightDp
+
+    var isLoading by remember { mutableStateOf(false) }
 
     var name by remember {
         mutableStateOf(TextFieldValue(""))
@@ -39,6 +44,17 @@ fun RegisterScreen() {
     }
     var vehicleNumber by remember {
         mutableStateOf(TextFieldValue(""))
+    }
+
+    var errorMessage by remember {
+        mutableStateOf("")
+    }
+
+    fun onActionButtonClick() {
+        isLoading = true
+        errorMessage = "Something went wrong. Please try again"
+        onRegisterSuccess()
+        isLoading = false
     }
 
     Box(
@@ -72,8 +88,8 @@ fun RegisterScreen() {
 
                 InputField(
                     label = "Name",
-                    value = name.text,
-                    onValueChange = { name = TextFieldValue(it) },
+                    value = name,
+                    onValueChange = { name = it },
                     keyboardType = KeyboardType.Text
                 )
 
@@ -88,15 +104,29 @@ fun RegisterScreen() {
                     label = "Select Vehicle",
                     value = vehicleNumber.text,
                     onValueChange = { vehicleNumber = TextFieldValue(it) },
-                    options = listOf("RJ 02 CE 0807", "DL 4A CV 2156", "DL 3C TA 9412", "HR 55 X 2822")
+                    options = listOf(
+                        "RJ 02 CE 0807",
+                        "DL 4A CV 2156",
+                        "DL 3C TA 9412",
+                        "HR 55 X 2822"
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
             }
 
             item {
-                ActionButton(text = "Register")
+                ErrorField(errorText = errorMessage)
+
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item {
+                ActionButton(
+                    text = "Register",
+                    isLoading = true,
+                    onClick = { onActionButtonClick() })
             }
         }
     }
