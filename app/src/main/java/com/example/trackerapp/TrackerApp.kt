@@ -7,8 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.example.trackerapp.presentation.auth.RegisterScreen
 import com.example.trackerapp.presentation.auth.LoginScreen
+import com.example.trackerapp.presentation.auth.RegisterScreen
 import com.example.trackerapp.presentation.home.HomeScreen
 
 @Composable
@@ -27,13 +27,13 @@ fun TrackerApp() {
 
             composable(route = Screen.LoginScreen.route) {
                 LoginScreen(
-                    onLoginSuccess = {navController.navigate(Screen.RegisterScreen.route)}
+                    onLoginSuccess = { navController.navigate(Screen.RegisterScreen.route) }
                 )
             }
 
             composable(route = Screen.RegisterScreen.route) {
                 RegisterScreen(
-                    onRegisterSuccess = {navController.navigate(Screen.HomeScreen.route)}
+                    onRegisterSuccess = { navController.navigate(Screen.HomeScreen.route) }
                 )
             }
         }

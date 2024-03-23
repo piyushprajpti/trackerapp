@@ -1,15 +1,30 @@
 package com.example.trackerapp.presentation.auth
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.trackerapp.domain.repository.AuthRepository
+import com.example.trackerapp.util.Response
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthViewModel : ViewModel() {
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val repository: AuthRepository
+) : ViewModel() {
 
-    fun onSendOTP() {
-
+    fun onSendOTP(number: String, callback: (Response<Boolean>) -> Unit) {
+        viewModelScope.launch {
+            val response = repository.sendOTP(number)
+            callback(response)
+        }
     }
 
-    fun onVerifyOTP() {
-
+    fun onVerifyOTP(otp: String, callback: (Response<Boolean>) -> Unit) {
+        viewModelScope.launch {
+            val response = repository.verifyOTP(otp)
+            callback(response)
+        }
     }
 
 }

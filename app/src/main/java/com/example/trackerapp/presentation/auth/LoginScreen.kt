@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,28 +18,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trackerapp.ui.theme.PrimaryGreen
 import com.example.trackerapp.ui.theme.PrimaryOrange
-import kotlinx.coroutines.delay
+import com.example.trackerapp.util.Response
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
 
     var isLoading by remember { mutableStateOf(false) }
-    var buttonLabel by remember {
-        mutableStateOf("Get OTP")
-    }
+
+    var buttonLabel by remember { mutableStateOf("Get OTP") }
 
     var otpSent by remember {
         mutableStateOf(false)
@@ -61,18 +57,47 @@ fun LoginScreen(
 
     LaunchedEffect(otpSent) {
         buttonLabel = if (otpSent) "Login" else "GET OTP"
-        delay(5000)
-
     }
 
     fun onActionButtonClick() {
         isLoading = true
+
         if (otpSent) {
-            isLoading = false
-            onLoginSuccess()
+            viewModel.onVerifyOTP(
+                otp = otp.text,
+                callback = {
+                    isLoading = false
+
+                    when (it) {
+                        is Response.Success -> {
+                            errorMessage = ""
+                            onLoginSuccess()
+                        }
+
+                        is Response.Error -> {
+                            errorMessage = it.error
+                        }
+                    }
+                }
+            )
         } else {
-            errorMessage = "server unreachable"
-            otpSent = true
+            viewModel.onSendOTP(
+                number = number.text,
+                callback = {
+                    isLoading = false
+
+                    when (it) {
+                        is Response.Success -> {
+                            errorMessage = ""
+                            otpSent = true
+                        }
+
+                        is Response.Error -> {
+                            errorMessage = it.error
+                        }
+                    }
+                }
+            )
         }
     }
 

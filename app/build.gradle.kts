@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ksp)
     alias(libs.plugins.daggerHilt)
+    alias(libs.plugins.ktorSerialization)
 }
 
 android {
@@ -87,5 +88,10 @@ dependencies {
     // ktor client
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.android)
+
+
+    // mappls
+    implementation (libs.mappls.andoid.sdk)
 
 }
