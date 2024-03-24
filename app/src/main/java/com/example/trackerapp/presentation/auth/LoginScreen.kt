@@ -64,6 +64,7 @@ fun LoginScreen(
 
         if (otpSent) {
             viewModel.onVerifyOTP(
+                number = number.text,
                 otp = otp.text,
                 callback = {
                     isLoading = false

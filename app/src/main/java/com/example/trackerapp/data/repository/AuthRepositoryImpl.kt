@@ -25,9 +25,9 @@ class AuthRepositoryImpl(
         }
     }
 
-    override suspend fun verifyOTP(otp: String): Response<Boolean> {
+    override suspend fun verifyOTP(number: String, otp: String): Response<Boolean> {
         return try {
-            service.verifyOTP(otp)
+            service.verifyOTP(number, otp)
             Response.Success(true)
         } catch (e: ClientRequestException) {
             Response.Error(e.response.body<OtpResponse>().message)

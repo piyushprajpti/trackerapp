@@ -20,9 +20,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun onVerifyOTP(otp: String, callback: (Response<Boolean>) -> Unit) {
+    fun onVerifyOTP(number: String, otp: String, callback: (Response<Boolean>) -> Unit) {
         viewModelScope.launch {
-            val response = repository.verifyOTP(otp)
+            val response = repository.verifyOTP(number, otp)
             callback(response)
         }
     }

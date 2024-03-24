@@ -23,11 +23,11 @@ class AuthServiceImpl(
         return response
     }
 
-    override suspend fun verifyOTP(otp: String): HttpResponse {
+    override suspend fun verifyOTP(number: String, otp: String): HttpResponse {
         val response =
             client.post("https://vehicle-tracking-gu26.onrender.com/api/v1/auth/otp/verify") {
                 contentType(ContentType.Application.Json)
-                setBody(OtpRequest(otp))
+                setBody(OtpRequest(number, otp))
             }
         return response
     }

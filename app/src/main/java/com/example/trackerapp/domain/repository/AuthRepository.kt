@@ -6,6 +6,6 @@ interface AuthRepository {
 
     suspend fun sendOTP(number: String) : Response<Boolean>
 
-    suspend fun verifyOTP(otp: String): Response<Boolean>
+    suspend fun verifyOTP(number: String, otp: String): Response<Boolean>
 
 }

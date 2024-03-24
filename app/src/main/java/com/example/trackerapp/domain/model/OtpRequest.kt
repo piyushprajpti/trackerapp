@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OtpRequest(
+    @SerializedName("number")
+    val number: String,
+
     @SerializedName("otp")
     val otp: String
 )

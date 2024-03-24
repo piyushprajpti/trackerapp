@@ -6,5 +6,5 @@ interface AuthService {
 
     suspend fun sendOTP(number: String) : HttpResponse
 
-    suspend fun verifyOTP(otp: String): HttpResponse
+    suspend fun verifyOTP(number: String, otp: String): HttpResponse
 }
