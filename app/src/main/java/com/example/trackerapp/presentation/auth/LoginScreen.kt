@@ -29,8 +29,9 @@ import com.example.trackerapp.util.Response
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
+    onRegistrationRedirect: (String) -> Unit,
+    onHomeRedirect: () -> Unit
 ) {
 
     val configuration = LocalConfiguration.current
@@ -61,6 +62,7 @@ fun LoginScreen(
 
     fun onActionButtonClick() {
         isLoading = true
+        errorMessage = ""
 
         if (otpSent) {
             viewModel.onVerifyOTP(
@@ -72,7 +74,8 @@ fun LoginScreen(
                     when (it) {
                         is Response.Success -> {
                             errorMessage = ""
-                            onLoginSuccess()
+                            if (it.data.message == "Login successful") onHomeRedirect()
+                            else onRegistrationRedirect(number.text)
                         }
 
                         is Response.Error -> {
@@ -146,7 +149,7 @@ fun LoginScreen(
                     label = "OTP",
                     value = otp,
                     onValueChange = {
-                        if (it.text.length <= 6) {
+                        if (it.text.length <= 4) {
                             otp = it
                         }
                     },
@@ -168,9 +171,3 @@ fun LoginScreen(
         }
     }
 }
-
-//@Preview(showSystemUi = true)
-//@Composable
-//private fun Preview() {
-//    LoginScreen()
-//}

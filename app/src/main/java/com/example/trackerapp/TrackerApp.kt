@@ -3,10 +3,12 @@ package com.example.trackerapp
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.trackerapp.presentation.auth.LoginScreen
 import com.example.trackerapp.presentation.auth.RegisterScreen
 import com.example.trackerapp.presentation.home.HomeScreen
@@ -27,12 +29,21 @@ fun TrackerApp() {
 
             composable(route = Screen.LoginScreen.route) {
                 LoginScreen(
-                    onLoginSuccess = { navController.navigate(Screen.RegisterScreen.route) }
+                    onRegistrationRedirect = { number -> navController.navigate(Screen.RegisterScreen.route + "?number=$number") },
+                    onHomeRedirect = { navController.navigate(Screen.HomeScreen.route) }
                 )
             }
 
-            composable(route = Screen.RegisterScreen.route) {
+            composable(
+                route = Screen.RegisterScreen.route + "?number={number}",
+                arguments = listOf(
+                    navArgument("number") {
+                        type = NavType.StringType
+                    }
+                )
+            ) {
                 RegisterScreen(
+                    number = it.arguments?.getString("number"),
                     onRegisterSuccess = { navController.navigate(Screen.HomeScreen.route) }
                 )
             }

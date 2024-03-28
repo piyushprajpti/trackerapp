@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,13 +21,16 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trackerapp.ui.theme.PrimaryGreen
 import com.example.trackerapp.ui.theme.PrimaryOrange
-import kotlinx.coroutines.delay
+import com.example.trackerapp.util.Response
 
 @Composable
 fun RegisterScreen(
-    onRegisterSuccess: () -> Unit
+    number: String?,
+    onRegisterSuccess: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
 
     val configuration = LocalConfiguration.current
@@ -52,9 +54,28 @@ fun RegisterScreen(
 
     fun onActionButtonClick() {
         isLoading = true
-        errorMessage = "Something went wrong. Please try again"
-        onRegisterSuccess()
-        isLoading = false
+        errorMessage = ""
+
+        viewModel.onRegisterUser(
+            number = number.toString(),
+            name = name.text,
+            firmName = firm.text,
+            vehicleNumber = vehicleNumber.text,
+            callback = {
+                isLoading = false
+
+                when (it) {
+                    is Response.Success -> {
+                        errorMessage = ""
+                        onRegisterSuccess()
+                    }
+
+                    is Response.Error -> {
+                        errorMessage = it.error
+                    }
+                }
+            }
+        )
     }
 
     Box(
@@ -125,7 +146,7 @@ fun RegisterScreen(
             item {
                 ActionButton(
                     text = "Register",
-                    isLoading = true,
+                    isLoading = isLoading,
                     onClick = { onActionButtonClick() })
             }
         }

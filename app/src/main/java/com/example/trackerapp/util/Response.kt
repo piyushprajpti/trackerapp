@@ -1,7 +1,7 @@
 package com.example.trackerapp.util
 
-sealed class Response<out PLACEHOLDER>{
-    data class Success<PLACEHOLDER>(val data: PLACEHOLDER) : Response<PLACEHOLDER>()
+sealed class Response<out T>{
+    data class Success<T>(val data: T) : Response<T>()
 
-    data class Error<PLACEHOLDER>(val error: String) : Response<PLACEHOLDER>()
+    data class Error<T>(val error: String) : Response<T>()
 }

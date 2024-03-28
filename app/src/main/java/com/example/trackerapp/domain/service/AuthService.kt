@@ -4,7 +4,14 @@ import io.ktor.client.statement.HttpResponse
 
 interface AuthService {
 
-    suspend fun sendOTP(number: String) : HttpResponse
+    suspend fun sendOTP(number: String): HttpResponse
 
     suspend fun verifyOTP(number: String, otp: String): HttpResponse
+
+    suspend fun registerUser(
+        number: String,
+        name: String,
+        firmName: String,
+        vehicleNumber: String
+    ) : HttpResponse
 }
