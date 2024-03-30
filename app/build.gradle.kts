@@ -95,6 +95,7 @@ dependencies {
 
     // datastore
     implementation(libs.androidx.datastore.preferences)
+    implementation("com.mappls.sdk:mappls-android-sdk:8.2.0")
 
 
 }

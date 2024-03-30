@@ -23,6 +23,13 @@ class MainActivity : ComponentActivity() {
         MapplsAccountManager.getInstance().atlasClientSecret = "lrFxI-iSEg8Vp_-BAuk76N73Pn-54eTqD4PTSszr6Ej-aNI1mZl2IUzwrhTJ3WInZIHHjYrfjB7Fj6zRwTbSodGqs8MTbzxr"
         Mappls.getInstance(applicationContext)
 
+//        MapplsAccountManager.getInstance().restAPIKey = "86f8f3653f24500c3b466a19a9698bf0"
+//        MapplsAccountManager.getInstance().mapSDKKey = "86f8f3653f24500c3b466a19a9698bf0"
+//        MapplsAccountManager.getInstance().atlasClientId = "96dHZVzsAusKW90dGFm6FO262HwMHZYJ_A7dCBC_pPr-o6fQfrkaa5c8YWWH7H7Eg61Y4V2awGkN65mjlfhabCzsfeMcq3L4"
+//        MapplsAccountManager.getInstance().atlasClientSecret = "lrFxI-iSEg8yg6kdM3XIDsnrzt62lLBWOdW-hCW1WMk856iLwoARCbgi6feWcaf0opGobnZodyIgDE71KazuAijQPzgKuf1JF9M8Rvzsuw0="
+//
+//        Mappls.getInstance(this)
+
         setContent {
             TrackerappTheme {
                 Surface(

@@ -61,50 +61,54 @@ fun LoginScreen(
     }
 
     fun onActionButtonClick() {
-        isLoading = true
-        errorMessage = ""
 
-        if (otpSent) {
-            viewModel.onVerifyOTP(
-                number = number.text,
-                otp = otp.text,
-                callback = {
-                    isLoading = false
+         onHomeRedirect()
 
-                    when (it) {
-                        is Response.Success -> {
-                            errorMessage = ""
-                            if (it.data.message == "Login successful") onHomeRedirect()
-                            else onRegistrationRedirect(number.text)
-                        }
 
-                        is Response.Error -> {
-                            errorMessage = it.error
-                        }
-                    }
-                }
-            )
-        } else {
-            viewModel.onSendOTP(
-                number = number.text,
-                callback = {
-                    isLoading = false
+//        isLoading = true
+//        errorMessage = ""
 
-                    when (it) {
-                        is Response.Success -> {
-                            errorMessage = ""
-                            otpSent = true
-                        }
-
-                        is Response.Error -> {
-                            errorMessage = it.error
-                        }
-                    }
-                }
-            )
-        }
+//        if (otpSent) {
+//            viewModel.onVerifyOTP(
+//                number = number.text,
+//                otp = otp.text,
+//                callback = {
+//                    isLoading = false
+//
+//                    when (it) {
+//                        is Response.Success -> {
+//                            errorMessage = ""
+//                            if (it.data.message == "Login successful") onHomeRedirect()
+//                            else onRegistrationRedirect(number.text)
+//                        }
+//
+//                        is Response.Error -> {
+//                            errorMessage = it.error
+//                        }
+//                    }
+//                }
+//            )
+//        } else {
+//            viewModel.onSendOTP(
+//                number = number.text,
+//                callback = {
+//                    isLoading = false
+//
+//                    when (it) {
+//                        is Response.Success -> {
+//                            errorMessage = ""
+//                            otpSent = true
+//                        }
+//
+//                        is Response.Error -> {
+//                            errorMessage = it.error
+//                        }
+//                    }
+//                }
+//            )
+//        }
+//    }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
