@@ -61,53 +61,48 @@ fun LoginScreen(
     }
 
     fun onActionButtonClick() {
+        isLoading = true
+        errorMessage = ""
 
-         onHomeRedirect()
+        if (otpSent) {
+            viewModel.onVerifyOTP(
+                number = number.text,
+                otp = otp.text,
+                callback = {
+                    isLoading = false
 
+                    when (it) {
+                        is Response.Success -> {
+                            errorMessage = ""
+                            if (it.data.message == "Login successful") onHomeRedirect()
+                            else onRegistrationRedirect(number.text)
+                        }
 
-//        isLoading = true
-//        errorMessage = ""
+                        is Response.Error -> {
+                            errorMessage = it.error
+                        }
+                    }
+                }
+            )
+        } else {
+            viewModel.onSendOTP(
+                number = number.text,
+                callback = {
+                    isLoading = false
 
-//        if (otpSent) {
-//            viewModel.onVerifyOTP(
-//                number = number.text,
-//                otp = otp.text,
-//                callback = {
-//                    isLoading = false
-//
-//                    when (it) {
-//                        is Response.Success -> {
-//                            errorMessage = ""
-//                            if (it.data.message == "Login successful") onHomeRedirect()
-//                            else onRegistrationRedirect(number.text)
-//                        }
-//
-//                        is Response.Error -> {
-//                            errorMessage = it.error
-//                        }
-//                    }
-//                }
-//            )
-//        } else {
-//            viewModel.onSendOTP(
-//                number = number.text,
-//                callback = {
-//                    isLoading = false
-//
-//                    when (it) {
-//                        is Response.Success -> {
-//                            errorMessage = ""
-//                            otpSent = true
-//                        }
-//
-//                        is Response.Error -> {
-//                            errorMessage = it.error
-//                        }
-//                    }
-//                }
-//            )
-//        }
-//    }
+                    when (it) {
+                        is Response.Success -> {
+                            errorMessage = ""
+                            otpSent = true
+                        }
+
+                        is Response.Error -> {
+                            errorMessage = it.error
+                        }
+                    }
+                }
+            )
+        }
     }
     Box(
         modifier = Modifier

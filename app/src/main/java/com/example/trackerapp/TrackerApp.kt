@@ -19,7 +19,7 @@ fun TrackerApp() {
 
     NavHost(
         navController = navController,
-        startDestination = "auth_graph",
+        startDestination = "home_graph",
         enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
     ) {

@@ -1,11 +1,7 @@
-package com.example.trackerapp.domain.model
+package com.example.trackerapp.domain.model.authModels
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 
 //@Serializable(with = OtpResponseSerializer::class)
 @Serializable

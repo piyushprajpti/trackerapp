@@ -1,10 +1,9 @@
 package com.example.trackerapp.data.repository
 
-import android.util.Log
-import com.example.trackerapp.domain.model.ErrorResponse
-import com.example.trackerapp.domain.model.LoginResponse
-import com.example.trackerapp.domain.model.OtpResponse
-import com.example.trackerapp.domain.model.RegisterResponse
+import com.example.trackerapp.domain.model.authModels.ErrorResponse
+import com.example.trackerapp.domain.model.authModels.LoginResponse
+import com.example.trackerapp.domain.model.authModels.OtpResponse
+import com.example.trackerapp.domain.model.authModels.RegisterResponse
 import com.example.trackerapp.domain.repository.AuthRepository
 import com.example.trackerapp.domain.service.AuthService
 import com.example.trackerapp.util.Response

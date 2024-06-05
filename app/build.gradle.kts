@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -92,10 +93,15 @@ dependencies {
 
     // mappls
     implementation (libs.mappls.andoid.sdk)
+    implementation(libs.mapmyindia.android.sdk)
+    implementation (libs.intouch.sdk)
 
     // datastore
     implementation(libs.androidx.datastore.preferences)
-    implementation("com.mappls.sdk:mappls-android-sdk:8.2.0")
 
-
+    // location api
+    implementation(libs.play.services.location)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.fragment.ktx)
+    implementation (libs.direction.ui)
 }

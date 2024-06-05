@@ -1,15 +1,13 @@
 package com.example.trackerapp.data.service
 
-import android.util.Log
-import com.example.trackerapp.domain.model.LoginRequest
-import com.example.trackerapp.domain.model.OtpRequest
-import com.example.trackerapp.domain.model.RegisterRequest
+import com.example.trackerapp.domain.model.authModels.LoginRequest
+import com.example.trackerapp.domain.model.authModels.OtpRequest
+import com.example.trackerapp.domain.model.authModels.RegisterRequest
 import com.example.trackerapp.domain.service.AuthService
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 

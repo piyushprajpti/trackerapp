@@ -18,8 +18,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
@@ -31,6 +35,7 @@ import com.mappls.sdk.maps.OnMapReadyCallback
 import com.mappls.sdk.maps.annotations.MarkerOptions
 import com.mappls.sdk.maps.camera.CameraPosition
 import com.mappls.sdk.maps.geometry.LatLng
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,16 +45,41 @@ fun HomeScreen(
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val lat = remember {
-        29.1492
+
+    var lat = remember {
+        mutableStateOf(27.887046)
+    }
+    var long = remember {
+        mutableStateOf(76.287877)
     }
 
-    val long = remember {
-        75.7217
+
+    LaunchedEffect(Unit) {
+        launch {
+            while (true) {
+                val newLat = lat.value + 1 // Update with a small increment
+                val newLong = long.value + 1
+                lat.value = newLat
+                long.value = newLong
+                delay(1000)
+            }
+        }
+    }
+
+    var userID by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getUserIdFromPref {
+            userID = it
+        }
     }
 
     ModalNavigationDrawer(
-        drawerContent = { NavigationDrawer() },
+        drawerContent = {
+            NavigationDrawer(
+                onCloseClick = { coroutineScope.launch { drawerState.close() } }
+            )
+        },
         drawerState = drawerState,
         gesturesEnabled = false,
         modifier = Modifier.background(Color.White)
@@ -67,7 +97,8 @@ fun HomeScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu Icon"
+                                contentDescription = "Menu Icon",
+                                tint = Color.White
                             )
                         }
                     }
@@ -76,7 +107,7 @@ fun HomeScreen(
             containerColor = Color.White,
         ) {
             Column(modifier = Modifier.padding(it)) {
-                CustomView(lat, long)
+                MapViewer(lat.value, long.value)
             }
         }
     }
@@ -84,7 +115,7 @@ fun HomeScreen(
 
 
 @Composable
-fun CustomView(lat: Double, long: Double) {
+fun MapViewer(lat: Double, long: Double) {
     AndroidView(
         modifier = Modifier.fillMaxSize(), // Occupy the max size in the Compose UI tree
         factory = { context ->
@@ -95,7 +126,7 @@ fun CustomView(lat: Double, long: Double) {
                         mapplsMap.addMarker(
                             MarkerOptions().position(
                                 LatLng(lat, long)
-                            ).title("Satish's Test Location")
+                            )
                         )
 
                         /* this is done for animating/moving camera to particular position */
@@ -116,3 +147,20 @@ fun CustomView(lat: Double, long: Double) {
         }
     )
 }
+
+//@Composable
+//fun AppNavigation() {
+//    val navController = rememberNavController()
+//    NavHost(navController = navController, startDestination = "direction_fragment") {
+//        composable("direction_fragment") {
+//            val context = LocalContext.current
+//            val directionFragment = remember { DirectionFragment.newInstance() }
+//            directionFragment.show(context.supportFragmentManager, DirectionFragment::class.java.simpleName)
+//        }
+//        composable("place_autocomplete_fragment") {
+//            val context = LocalContext.current
+//            val placeAutocompleteFragment = remember { DirectionFragment.newInstance(directionOptions) }
+//            placeAutocompleteFragment.show(context.supportFragmentManager, PlaceAutocompleteFragment::class.java.simpleName)
+//        }
+//    }
+//}

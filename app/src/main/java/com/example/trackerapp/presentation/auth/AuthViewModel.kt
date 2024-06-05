@@ -1,16 +1,14 @@
 package com.example.trackerapp.presentation.auth
 
-import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trackerapp.data.repository.DataStoreRepository
-import com.example.trackerapp.domain.model.OtpResponse
-import com.example.trackerapp.domain.model.RegisterResponse
+import com.example.trackerapp.domain.model.authModels.OtpResponse
+import com.example.trackerapp.domain.model.authModels.RegisterResponse
 import com.example.trackerapp.domain.repository.AuthRepository
 import com.example.trackerapp.util.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

@@ -1,7 +1,7 @@
 package com.example.trackerapp.domain.repository
 
-import com.example.trackerapp.domain.model.OtpResponse
-import com.example.trackerapp.domain.model.RegisterResponse
+import com.example.trackerapp.domain.model.authModels.OtpResponse
+import com.example.trackerapp.domain.model.authModels.RegisterResponse
 import com.example.trackerapp.util.Response
 
 interface AuthRepository {
