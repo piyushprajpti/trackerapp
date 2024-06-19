@@ -1,13 +1,13 @@
 [versions]
 accompanistPermissions = "0.35.0-alpha"
-agp = "8.4.1"
+agp = "8.5.0"
 datastorePreferences = "1.1.1"
 directionUi = "1.0.0"
 fragmentKtx = "1.7.1"
 hiltAndroid = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 intouchSdk = "0.9.4"
-kotlin = "1.9.22"
+kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -18,17 +18,16 @@ ktorSerializationKotlinxJson = "2.3.11"
 lifecycleRuntimeKtx = "2.8.1"
 activityCompose = "1.9.0"
 composeBom = "2024.05.00"
-ksp = "1.9.22-1.0.17"
+ksp = "2.0.0-1.0.22"
 daggerHilt = "2.50"
-mapmyindiaAndroidSdk = "6.8.2"
 materialIconsCore = "1.6.7"
 navigationCompose = "2.7.7"
 playServicesLocation = "21.3.0"
-playServicesLocationVersion = "18.0.0"
 roomCompiler = "2.6.1"
 mapplsSdk = "8.2.0"
-ktorPluginVersion = "1.9.22"
+ktorPluginVersion = "2.0.0"
 playServicesMaps = "18.2.0"
+workRuntimeKtx = "2.9.0"
 
 
 [libraries]
@@ -41,6 +40,7 @@ androidx-material-icons-core = { module = "androidx.compose.material:material-ic
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 direction-ui = { module = "com.mappls.sdk:direction-ui", version.ref = "directionUi" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
@@ -61,10 +61,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorSerializationKotlinxJson" }
-mapmyindia-android-sdk = { module = "com.mapmyindia.sdk:mapmyindia-android-sdk", version.ref = "mapmyindiaAndroidSdk" }
 mappls-andoid-sdk = { module = "com.mappls.sdk:mappls-android-sdk", version.ref = "mapplsSdk" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
-play-services-location-v1800 = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocationVersion" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 
@@ -74,4 +72,6 @@ jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "k
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 daggerHilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 ktorSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref="ktorPluginVersion"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
 

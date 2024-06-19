@@ -17,13 +17,13 @@ object HomeModule {
 
     @Singleton
     @Provides
-    fun provideHomeService(client: HttpClient): HomeService {
+    fun providesHomeService(client: HttpClient): HomeService {
         return HomeServiceImpl(client)
     }
 
     @Singleton
     @Provides
-    fun provideHomeRepository(service: HomeService): HomeRepository {
+    fun providesHomeRepository(service: HomeService): HomeRepository {
         return HomeRepositoryImpl(service)
     }
 }

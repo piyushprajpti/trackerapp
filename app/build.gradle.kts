@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.daggerHilt)
     alias(libs.plugins.ktorSerialization)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -71,6 +72,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(libs.androidx.work.runtime.ktx)
+
     // room library
     ksp(libs.androidx.room.compiler)
 
@@ -93,7 +96,6 @@ dependencies {
 
     // mappls
     implementation (libs.mappls.andoid.sdk)
-    implementation(libs.mapmyindia.android.sdk)
     implementation (libs.intouch.sdk)
 
     // datastore

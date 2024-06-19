@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
             TrackerappTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.White
+//                    color = Color.White
                 ) {
                     TrackerApp()
                 }

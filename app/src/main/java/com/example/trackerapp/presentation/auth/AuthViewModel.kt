@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.trackerapp.data.repository.DataStoreRepository
 import com.example.trackerapp.domain.model.authModels.OtpResponse
 import com.example.trackerapp.domain.model.authModels.RegisterResponse
+import com.example.trackerapp.domain.model.mapModels.firmList.FirmListResponse
 import com.example.trackerapp.domain.repository.AuthRepository
 import com.example.trackerapp.util.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,12 +53,17 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun getFirmList(callBack: (Response<FirmListResponse>) -> Unit) {
+        viewModelScope.launch {
+            val response = repository.getFirmList()
+            callBack(response)
+        }
+    }
+
     private fun setUserIDInPref(id: String) {
         viewModelScope.launch {
             dataStoreRepository.setValue(stringPreferencesKey("user_id"), id)
         }
     }
-
-
 
 }

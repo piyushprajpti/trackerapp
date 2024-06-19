@@ -5,6 +5,7 @@ import com.example.trackerapp.domain.model.authModels.OtpRequest
 import com.example.trackerapp.domain.model.authModels.RegisterRequest
 import com.example.trackerapp.domain.service.AuthService
 import io.ktor.client.HttpClient
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -43,4 +44,10 @@ class AuthServiceImpl(
         }
         return response
     }
+
+    override suspend fun getFirmList(): HttpResponse {
+        val response = client.get("https://vehicle-tracking-gu26.onrender.com/api/v1/auth/getIdAllFirm")
+        return response
+    }
+
 }

@@ -19,13 +19,13 @@ fun TrackerApp() {
 
     NavHost(
         navController = navController,
-        startDestination = "home_graph",
+        startDestination = Screen.HomeGraph.route,
         enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
     ) {
 
         // 1. Authentication Graph
-        navigation(route = "auth_graph", startDestination = Screen.LoginScreen.route) {
+        navigation(route = Screen.AuthGraph.route, startDestination = Screen.RegisterScreen.route) {
 
             composable(route = Screen.LoginScreen.route) {
                 LoginScreen(
@@ -35,24 +35,30 @@ fun TrackerApp() {
             }
 
             composable(
-                route = Screen.RegisterScreen.route + "?number={number}",
+                route = Screen.RegisterScreen.route /*+ "?number={number}"*/,
                 arguments = listOf(
                     navArgument("number") {
                         type = NavType.StringType
                     }
                 )
             ) {
+                val number = it.arguments?.getString("number")
+
                 RegisterScreen(
-                    number = it.arguments?.getString("number"),
+                    number = number,
                     onRegisterSuccess = { navController.navigate(Screen.HomeScreen.route) }
                 )
             }
         }
 
         // 2. Home Graph
-        navigation(route = "home_graph", startDestination = Screen.HomeScreen.route) {
+        navigation(route = Screen.HomeGraph.route, startDestination = Screen.HomeScreen.route) {
             composable(route = Screen.HomeScreen.route) {
-                HomeScreen()
+                HomeScreen(
+                    authRedirect = {
+                        navController.navigate(Screen.AuthGraph.route)
+                    }
+                )
             }
         }
     }

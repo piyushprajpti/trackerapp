@@ -2,6 +2,7 @@ package com.example.trackerapp.domain.repository
 
 import com.example.trackerapp.domain.model.authModels.OtpResponse
 import com.example.trackerapp.domain.model.authModels.RegisterResponse
+import com.example.trackerapp.domain.model.mapModels.firmList.FirmListResponse
 import com.example.trackerapp.util.Response
 
 interface AuthRepository {
@@ -16,5 +17,7 @@ interface AuthRepository {
         firmName: String,
         vehicleNumber: String
     ): Response<RegisterResponse>
+
+    suspend fun getFirmList(): Response<FirmListResponse>
 
 }

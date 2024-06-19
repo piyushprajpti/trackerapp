@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.daggerHilt) apply false
     alias(libs.plugins.ktorSerialization) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }

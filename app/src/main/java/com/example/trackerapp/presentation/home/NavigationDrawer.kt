@@ -11,36 +11,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trackerapp.ui.theme.PrimaryGreen
 
 @Composable
 fun NavigationDrawer(
-    viewModel: HomeViewModel = hiltViewModel(),
     onCloseClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
-            .fillMaxHeight()
+            .fillMaxSize()
             .background(Color.Transparent)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(.75f)
+                .fillMaxWidth(0.75f)
                 .fillMaxHeight()
                 .background(Color.White)
                 .padding(start = 15.dp, top = 15.dp)
@@ -72,31 +65,9 @@ fun NavigationDrawer(
 
         }
 
-        Box(modifier = Modifier.fillMaxSize().clickable { onCloseClick() })
-
-//        IconButton(
-//            onClick = { onCloseClick() },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight()
-//        ) {
-//            Icon(
-//                imageVector = Icons.Default.Close,
-//                contentDescription = "close",
-//                tint = Color(0xCBFFFFFF),
-//                modifier = Modifier
-//                    .size(50.dp)
-//
-//            )
-//        }
-
-    }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-private fun Preview() {
-    NavigationDrawer {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable { onCloseClick() })
 
     }
 }

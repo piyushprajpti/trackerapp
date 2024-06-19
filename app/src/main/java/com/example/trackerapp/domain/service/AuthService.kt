@@ -14,4 +14,6 @@ interface AuthService {
         firmName: String,
         vehicleNumber: String
     ) : HttpResponse
+
+    suspend fun getFirmList(): HttpResponse
 }
