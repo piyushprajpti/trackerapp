@@ -1,5 +1,7 @@
 package com.example.trackerapp
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import com.example.trackerapp.presentation.auth.LoginScreen
 import com.example.trackerapp.presentation.auth.RegisterScreen
 import com.example.trackerapp.presentation.home.HomeScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TrackerApp() {
     val navController = rememberNavController()
@@ -25,28 +28,28 @@ fun TrackerApp() {
     ) {
 
         // 1. Authentication Graph
-        navigation(route = Screen.AuthGraph.route, startDestination = Screen.RegisterScreen.route) {
+        navigation(route = Screen.AuthGraph.route, startDestination = Screen.LoginScreen.route) {
 
             composable(route = Screen.LoginScreen.route) {
                 LoginScreen(
-                    onRegistrationRedirect = { number -> navController.navigate(Screen.RegisterScreen.route + "?number=$number") },
-                    onHomeRedirect = { navController.navigate(Screen.HomeScreen.route) }
+                    onRegistrationRedirect = {
+                        navController.navigate(Screen.RegisterScreen.route)
+                    },
+                    onHomeRedirect = {
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.AuthGraph.route) { inclusive = true }
+                        }
+                    }
                 )
             }
 
-            composable(
-                route = Screen.RegisterScreen.route /*+ "?number={number}"*/,
-                arguments = listOf(
-                    navArgument("number") {
-                        type = NavType.StringType
-                    }
-                )
-            ) {
-                val number = it.arguments?.getString("number")
-
+            composable(route = Screen.RegisterScreen.route) {
                 RegisterScreen(
-                    number = number,
-                    onRegisterSuccess = { navController.navigate(Screen.HomeScreen.route) }
+                    onRegisterSuccess = {
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.AuthGraph.route) { inclusive = true }
+                        }
+                    }
                 )
             }
         }
@@ -56,7 +59,9 @@ fun TrackerApp() {
             composable(route = Screen.HomeScreen.route) {
                 HomeScreen(
                     authRedirect = {
-                        navController.navigate(Screen.AuthGraph.route)
+                        navController.navigate(Screen.AuthGraph.route) {
+                            popUpTo(Screen.HomeGraph.route) { inclusive = true }
+                        }
                     }
                 )
             }

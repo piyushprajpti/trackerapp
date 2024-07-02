@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CommonViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
-    ) : ViewModel() {
+) : ViewModel() {
     fun setValueInPref(key: String, value: String) {
         viewModelScope.launch {
             dataStoreRepository.setValue(stringPreferencesKey(key), value)
@@ -22,6 +22,5 @@ class CommonViewModel @Inject constructor(
     suspend fun getValueFromPref(key: String): String? {
         val flow = dataStoreRepository.getValue(stringPreferencesKey(key))
         return flow.firstOrNull()
-
     }
 }

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OtpRequest(
+data class VerifyOtpRequest(
     @SerialName("number")
     val number: String,
 

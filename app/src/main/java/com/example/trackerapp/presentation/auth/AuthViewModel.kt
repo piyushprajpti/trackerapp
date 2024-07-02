@@ -4,12 +4,14 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trackerapp.data.repository.DataStoreRepository
-import com.example.trackerapp.domain.model.authModels.OtpResponse
 import com.example.trackerapp.domain.model.authModels.RegisterResponse
+import com.example.trackerapp.domain.model.authModels.SendOtpResponse
+import com.example.trackerapp.domain.model.authModels.VerifyOtpResponse
 import com.example.trackerapp.domain.model.mapModels.firmList.FirmListResponse
 import com.example.trackerapp.domain.repository.AuthRepository
 import com.example.trackerapp.util.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,37 +21,53 @@ class AuthViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
-    fun onSendOTP(number: String, callback: (Response<Boolean>) -> Unit) {
+    fun onSendOTP(number: String, callback: (Response<SendOtpResponse>) -> Unit) {
         viewModelScope.launch {
             val response = repository.sendOTP(number)
+            if (response is Response.Success) {
+                setValueInPref("number", number)
+            }
             callback(response)
         }
     }
 
-    fun onVerifyOTP(number: String, otp: String, callback: (Response<OtpResponse>) -> Unit) {
+    fun onVerifyOTP(number: String, otp: String, callback: (Response<VerifyOtpResponse>) -> Unit) {
         viewModelScope.launch {
             val response = repository.verifyOTP(number, otp)
-            if (response is Response.Success) {
-                response.data.existingUser?.let { setUserIDInPref(it.id) }
-                response.data.newUser?.let { setUserIDInPref(it.id) }
-            }
             callback(response)
         }
     }
 
     fun onRegisterUser(
-        number: String,
         name: String,
         firmName: String,
+        appId: String,
+        signature: String,
         vehicleNumber: String,
         callback: (Response<RegisterResponse>) -> Unit
     ) {
         viewModelScope.launch {
-            val response = repository.registerUser(number, name, firmName, vehicleNumber)
+            var number = getValueFromPref("number")
+            if (number == null) number = ""
+
+            val response = repository.registerUser(
+                number,
+                name,
+                firmName,
+                appId,
+                signature,
+                vehicleNumber
+            )
+
             if (response is Response.Success) {
-                response.data.category?.let { setUserIDInPref(it.id) }
+                setValueInPref("name", name)
+                setValueInPref("firmName", firmName)
+                setValueInPref("appId", appId)
+                setValueInPref("signature", signature)
+                setValueInPref("vehicleNumber", vehicleNumber)
+
+                callback(response)
             }
-            callback(response)
         }
     }
 
@@ -60,10 +78,12 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun setUserIDInPref(id: String) {
-        viewModelScope.launch {
-            dataStoreRepository.setValue(stringPreferencesKey("user_id"), id)
-        }
+    suspend fun setValueInPref(key: String, value: String) {
+            dataStoreRepository.setValue(stringPreferencesKey(key), value)
+    }
+
+    suspend fun getValueFromPref(key: String): String? {
+        return dataStoreRepository.getValue(stringPreferencesKey(key)).first()
     }
 
 }

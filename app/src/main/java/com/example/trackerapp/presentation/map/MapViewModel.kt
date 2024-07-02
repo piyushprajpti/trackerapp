@@ -1,11 +1,11 @@
 package com.example.trackerapp.presentation.map
 
+import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trackerapp.data.repository.DataStoreRepository
 import com.example.trackerapp.domain.model.mapModels.deviceList.DeviceListResponse
-import com.example.trackerapp.domain.model.mapModels.firmList.FirmListResponse
 import com.example.trackerapp.domain.model.mapModels.historyPlayback.HistoryPlaybackResponse
 import com.example.trackerapp.domain.model.mapModels.liveLocation.LiveLocationResponse
 import com.example.trackerapp.domain.repository.MapRepository
@@ -31,7 +31,7 @@ class MapViewModel @Inject constructor(
 
             if (response is Response.Success) {
                 if (response.data.code == 0) {
-                    setValueInPref("access_token",response.data.accessToken)
+                    setValueInPref("access_token", response.data.accessToken)
                     callBack(true)
                 } else if (response.data.code == 10004) {
                     callBack(false)
@@ -51,11 +51,11 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             val accessToken = getValueFromPref("access_token")
             val response = repository.getDeviceList(
-                    accessToken.toString(),
-                    atPage,
-                    pageSize,
-                    needCount
-                )
+                accessToken.toString(),
+                atPage,
+                pageSize,
+                needCount
+            )
 
             callBack(response)
         }
@@ -71,12 +71,21 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun getHistoryPlayback(startTime: Long, endTime: Long, callBack: (Response<HistoryPlaybackResponse>) -> Unit) {
+    fun getHistoryPlayback(
+        imei: String,
+        startTime: Long,
+        endTime: Long,
+        callBack: (Response<HistoryPlaybackResponse>) -> Unit
+    ) {
         viewModelScope.launch {
             val accessToken = getValueFromPref("access_token")
-            val imei = getValueFromPref("imei")
 
-            val response = repository.getHistoryPlayback(accessToken.toString(), imei.toString(), startTime, endTime)
+            val response = repository.getHistoryPlayback(
+                accessToken.toString(),
+                imei,
+                startTime,
+                endTime
+            )
             callBack(response)
         }
     }
@@ -91,6 +100,5 @@ class MapViewModel @Inject constructor(
     suspend fun getValueFromPref(key: String): String? {
         val flow = dataStoreRepository.getValue(stringPreferencesKey(key))
         return flow.firstOrNull()
-
     }
 }

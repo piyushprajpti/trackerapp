@@ -1,12 +1,15 @@
 package com.example.trackerapp.data.service
 
+import android.util.Log
 import com.example.trackerapp.domain.model.mapModels.accessToken.AccessTokenRequest
 import com.example.trackerapp.domain.service.MapService
+import com.example.trackerapp.util.MapUrl
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
@@ -21,7 +24,7 @@ class MapServiceImpl(
 
         val unixTime = System.currentTimeMillis() / 1000
 
-        val response = client.post("https://open.iopgps.com/api/auth/") {
+        val response = client.post("$MapUrl/auth/") {
             contentType(ContentType.Application.Json)
             setBody(AccessTokenRequest(appId, 1715850396, signature))
         }
@@ -36,14 +39,13 @@ class MapServiceImpl(
         needCount: Boolean
     ): HttpResponse {
         val response =
-            client.get("https://open.iopgps.com/api//device?accessToken=$accessToken&atPage=$atPage&pageSize=$pageSize&needCount=$needCount")
+            client.get("$MapUrl/device?accessToken=$accessToken&atPage=$atPage&pageSize=$pageSize&needCount=$needCount")
         return response
     }
 
     override suspend fun getLiveLocation(accessToken: String, imei: String): HttpResponse {
         val response =
-            client.get("https://open.iopgps.com/api/device/location?accessToken=$accessToken&imei=$imei")
-
+            client.get("$MapUrl/device/location?accessToken=$accessToken&imei=$imei")
         return response
     }
 
@@ -54,8 +56,7 @@ class MapServiceImpl(
         endTime: Long
     ): HttpResponse {
         val response =
-            client.get("https://open.iopgps.com/api/device/track/history?accessToken=$accessToken&imei=$imei&startTime=$startTime&endTime=$endTime")
-
+            client.get("$MapUrl/device/track/history?accessToken=$accessToken&imei=$imei&startTime=$startTime&endTime=$endTime")
         return response
     }
 

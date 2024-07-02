@@ -34,7 +34,6 @@ import kotlinx.coroutines.withTimeout
 
 @Composable
 fun RegisterScreen(
-    number: String?,
     onRegisterSuccess: () -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
     mapViewModel: MapViewModel = hiltViewModel()
@@ -76,11 +75,13 @@ fun RegisterScreen(
     }
 
     LaunchedEffect(key1 = "") {
+        showLoadingScreen = true
         try {
-            withTimeout(20000) { // 20 seconds timeout
+            withTimeout(5000) { // 5 seconds timeout
                 authViewModel.getFirmList {
                     when (it) {
                         is Response.Success -> {
+                            showLoadingScreen = false
                             firmList = it.data.FirmList.map {
                                 FirmList(
                                     firmName = it.firmName,
@@ -91,13 +92,13 @@ fun RegisterScreen(
                         }
 
                         is Response.Error -> {
-                            errorMessage = "Unable to fetch firm list"
+                            errorMessage = "Server down. Unable to fetch firm list"
                         }
                     }
                 }
             }
         } catch (e: Exception) {
-            errorMessage = "Request timed out. Please try again."
+            errorMessage = "E: Server down. Unable to fetch firm list"
         }
     }
 
@@ -154,42 +155,35 @@ fun RegisterScreen(
     }
 
     fun onActionButtonClick() {
-        isLoading = true
         errorMessage = ""
 
-        authViewModel.onRegisterUser(
-            number = number.toString(),
-            name = name.text,
-            firmName = selectedFirm.text,
-            vehicleNumber = selectedVehicle.text,
-            callback = {
-                isLoading = false
+        if (name.text.isBlank() || selectedFirm.text.isBlank() || selectedVehicle.text.isBlank()) {
+            errorMessage = "Fields can't be empty"
+        } else {
+            isLoading = true
 
-                when (it) {
-                    is Response.Success -> {
-                        errorMessage = ""
-                        mapViewModel.setValueInPref("appid", selectedFirmInfo.appid)
-//                        Log.d("TAG", "onActionButtonClick: ${selectedFirmInfo.appid}")
-                        mapViewModel.setValueInPref("signature", selectedFirmInfo.signature)
-//                        Log.d("TAG", "onActionButtonClick: ${selectedFirmInfo.signature}")
-                        mapViewModel.setValueInPref("imei", selectedDeviceInfo.imei)
-//                        Log.d("TAG", "onActionButtonClick: ${selectedDeviceInfo.imei}")
-                        onRegisterSuccess()
-                    }
+            authViewModel.onRegisterUser(
+                name = name.text,
+                firmName = selectedFirm.text,
+                appId = selectedFirmInfo.appid,
+                signature = selectedFirmInfo.signature,
+                vehicleNumber = selectedVehicle.text,
+                callback = {
+                    isLoading = false
 
-                    is Response.Error -> {
-                        mapViewModel.setValueInPref("appid", selectedFirmInfo.appid)
-//                        Log.d("TAG", "onActionButtonClick: ${selectedFirmInfo.appid}")
-                        mapViewModel.setValueInPref("signature", selectedFirmInfo.signature)
-//                        Log.d("TAG", "onActionButtonClick: ${selectedFirmInfo.signature}")
-                        mapViewModel.setValueInPref("imei", selectedDeviceInfo.imei)
-//                        Log.d("TAG", "onActionButtonClick: ${selectedDeviceInfo.imei}")
-                        onRegisterSuccess()
-                        errorMessage = it.error
+                    when (it) {
+                        is Response.Success -> {
+                            errorMessage = ""
+                            onRegisterSuccess()
+                        }
+
+                        is Response.Error -> {
+                            errorMessage = it.error
+                        }
                     }
                 }
-            }
-        )
+            )
+        }
     }
 
 

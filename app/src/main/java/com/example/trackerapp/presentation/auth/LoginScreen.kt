@@ -25,14 +25,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.trackerapp.presentation.home.HomeViewModel
 import com.example.trackerapp.ui.theme.PrimaryGreen
 import com.example.trackerapp.ui.theme.PrimaryOrange
 import com.example.trackerapp.util.Response
 
 @Composable
 fun LoginScreen(
-    viewModel: AuthViewModel = hiltViewModel(),
-    onRegistrationRedirect: (String) -> Unit,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    onRegistrationRedirect: () -> Unit,
     onHomeRedirect: () -> Unit
 ) {
 
@@ -59,55 +61,87 @@ fun LoginScreen(
         mutableStateOf("")
     }
 
+    var otpResponse by remember {
+        mutableStateOf("")
+    }
+
+    fun onSuccessfulVerify() {
+        homeViewModel.getUserInfo {
+            when (it) {
+                true -> {
+                    onHomeRedirect()
+                }
+
+                false -> {
+                    errorMessage = "Something went wrong. Please click login again"
+                }
+            }
+        }
+    }
+
     LaunchedEffect(otpSent) {
         buttonLabel = if (otpSent) "Login" else "GET OTP"
     }
 
     fun onActionButtonClick() {
-        isLoading = true
         errorMessage = ""
 
-        if (otpSent) {
-            viewModel.onVerifyOTP(
-                number = number.text,
-                otp = otp.text,
-                callback = {
-                    isLoading = false
+        if (!otpSent) {
+            if (number.text.isBlank()) {
+                errorMessage = "Number can't be empty"
+            } else if (number.text.length < 10) {
+                errorMessage = "Please enter a valid 10 digit number"
+            } else {
+                isLoading = true
+                authViewModel.onSendOTP(
+                    number = number.text,
+                    callback = {
+                        isLoading = false
 
-                    when (it) {
-                        is Response.Success -> {
-                            errorMessage = ""
-                            /*if (it.data.message == "Login successful") onHomeRedirect()
-                            else*/ onRegistrationRedirect(number.text)
-                        }
+                        when (it) {
+                            is Response.Success -> {
+                                errorMessage = ""
+                                otpResponse = it.data.message
+                                otpSent = true
+                                Toast.makeText(context, "OTP sent successfully", Toast.LENGTH_LONG)
+                                    .show()
+                            }
 
-                        is Response.Error -> {
-                            errorMessage = it.error
+                            is Response.Error -> {
+                                errorMessage = it.error
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         } else {
-            viewModel.onSendOTP(
-                number = number.text,
-                callback = {
-                    isLoading = false
+            if (otp.text.isBlank()) {
+                errorMessage = "Otp can't be empty"
+            } else {
+                isLoading = true
+                authViewModel.onVerifyOTP(
+                    number = number.text,
+                    otp = otp.text,
+                    callback = {
+                        isLoading = false
 
-                    when (it) {
-                        is Response.Success -> {
-                            errorMessage = ""
-                            otpSent = true
-                            Toast.makeText(context, "OTP sent successfully", Toast.LENGTH_LONG).show()
-                        }
+                        when (it) {
+                            is Response.Success -> {
+                                errorMessage = ""
+                                if (otpResponse == "OTP sent for login successfully") onSuccessfulVerify()
+                                else onRegistrationRedirect()
+                            }
 
-                        is Response.Error -> {
-                            errorMessage = it.error
+                            is Response.Error -> {
+                                errorMessage = it.error
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

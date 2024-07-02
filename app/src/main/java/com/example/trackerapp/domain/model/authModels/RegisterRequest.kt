@@ -14,6 +14,12 @@ data class RegisterRequest(
     @SerialName("firm")
     val firmName: String,
 
+    @SerialName("appId")
+    val appId: String,
+
+    @SerialName("signature")
+    val signature: String,
+
     @SerialName("vehicleNumber")
     val vehicleNumber: String,
 

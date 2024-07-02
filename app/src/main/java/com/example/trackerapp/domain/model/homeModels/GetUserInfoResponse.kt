@@ -1,43 +1,29 @@
-package com.example.trackerapp.domain.model.authModels
+package com.example.trackerapp.domain.model.homeModels
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterResponse(
-    @SerialName("success")
-    val success: Boolean,
+data class GetUserInfoResponse(
 
     @SerialName("message")
     val message: String,
 
-    @SerialName("updateuser")
-    val updateuser: Updateuser? = null,
-
-    @SerialName("token")
-    val token: String? = null
+    @SerialName("profile")
+    val profile: Profile? = null
 )
 
 @Serializable
-data class Updateuser(
+data class Profile(
+
+    @SerialName("_id")
+    val id: String,
 
     @SerialName("number")
     val number: Long,
 
     @SerialName("name")
     val name: String,
-
-    @SerialName("firm")
-    val firmName: String,
-
-    @SerialName("appId")
-    val appId: String,
-
-    @SerialName("signature")
-    val signature: String,
-
-    @SerialName("vehicleNumber")
-    val vehicleNumber: String,
 
     @SerialName("state")
     val state: String = "",
@@ -48,8 +34,17 @@ data class Updateuser(
     @SerialName("cityOrVillage")
     val cityOrVillage: String = "",
 
-    @SerialName("_id")
-    val _id: String,
+    @SerialName("firm")
+    val firm: String,
+
+    @SerialName("appId")
+    val appId: String,
+
+    @SerialName("signature")
+    val signature: String,
+
+    @SerialName("vehicleNumber")
+    val vehicleNumber: String,
 
     @SerialName("createdAt")
     val createdAt: String,
@@ -58,5 +53,5 @@ data class Updateuser(
     val updatedAt: String,
 
     @SerialName("__v")
-    val __v: Int
+    val version: Int,
 )

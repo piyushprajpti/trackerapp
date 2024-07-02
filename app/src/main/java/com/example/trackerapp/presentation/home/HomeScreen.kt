@@ -4,21 +4,14 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,24 +19,31 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.trackerapp.R
 import com.example.trackerapp.domain.model.mapModels.deviceList.VehicleList
-import com.example.trackerapp.domain.model.mapModels.historyPlayback.Info
+import com.example.trackerapp.domain.model.mapModels.historyPlayback.PlaybackLatLngList
 import com.example.trackerapp.presentation.map.MapViewModel
-import com.example.trackerapp.ui.theme.PrimaryGreen
+import com.example.trackerapp.presentation.map.MapViewer
+import com.example.trackerapp.ui.theme.PrimaryOrange
 import com.example.trackerapp.util.LoadingScreen
 import com.example.trackerapp.util.Response
 import com.mappls.sdk.maps.MapView
 import com.mappls.sdk.maps.MapplsMap
 import com.mappls.sdk.maps.OnMapReadyCallback
+import com.mappls.sdk.maps.annotations.Icon
+import com.mappls.sdk.maps.annotations.IconFactory
 import com.mappls.sdk.maps.annotations.MarkerOptions
+import com.mappls.sdk.maps.annotations.PolylineOptions
 import com.mappls.sdk.maps.camera.CameraPosition
 import com.mappls.sdk.maps.geometry.LatLng
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -51,12 +51,15 @@ fun HomeScreen(
     mapViewModel: MapViewModel = hiltViewModel(),
     authRedirect: () -> Unit
 ) {
-    var drawerState = remember {
+    val drawerState = remember {
         mutableStateOf(false)
     }
 
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    val carIcon = remember {
+        IconFactory.getInstance(context).fromResource(R.drawable.car)
+    }
 
     var vehicleList by remember {
         mutableStateOf<List<VehicleList>>(emptyList())
@@ -71,21 +74,85 @@ fun HomeScreen(
     }
 
     val lat = remember {
-        mutableStateOf("27.887046")
+        mutableStateOf("28.6185149")
     }
     val lng = remember {
-        mutableStateOf("76.287877")
+        mutableStateOf("77.2141112")
     }
 
-    var playbackLatLng by remember {
-        mutableStateOf<List<Info>>(emptyList())
+    val selectedScreen = remember {
+        mutableStateOf(1)
     }
 
-    val showPlaybackBox = remember {
+    val isPlaybackStarted = remember {
         mutableStateOf(false)
     }
 
-    fun getDeviceList(appid: String?, signature: String?, imei: String?) {
+
+    val activeSpeedButton = remember {
+        mutableStateOf(1)
+    }
+
+    val playbackLatLngList = remember {
+        mutableStateOf<List<PlaybackLatLngList>>(emptyList())
+    }
+
+    fun createPolyline() {
+
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        val endTime = calendar.timeInMillis / 1000
+
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+        val startTime = calendar.timeInMillis / 1000
+
+        mapViewModel.getHistoryPlayback(
+            imei = vehicleList.find { selectedVehicle.value.text == it.vehicleNumber }?.imei
+                ?: "",
+            startTime = startTime,
+            endTime = endTime,
+            callBack = {
+                when (it) {
+                    is Response.Success -> {
+                        if (it.data.playbackLatLngList.isEmpty()) {
+                            Toast.makeText(
+                                context,
+                                "No vehicle movement records found in last 24 hours",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            playbackLatLngList.value = it.data.playbackLatLngList.map {
+                                PlaybackLatLngList(
+                                    code = it.code,
+                                    imei = it.imei,
+                                    lat = it.lat,
+                                    lng = it.lng,
+                                    speed = it.speed,
+                                    course = it.course,
+                                    gpsTime = it.gpsTime,
+                                    positionType = it.positionType
+                                )
+                            }
+                        }
+                    }
+
+                    is Response.Error -> {
+                        Toast.makeText(
+                            context,
+                            "Unable to draw polyline",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        )
+    }
+
+    fun getDeviceList(appid: String?, signature: String?) {
         showLoadingScreen = true
 
         mapViewModel.generateAccessToken(
@@ -104,10 +171,15 @@ fun HomeScreen(
                                             imei = it.imei
                                         )
                                     }
-                                    selectedVehicle.value = TextFieldValue(
-                                        vehicleList.find { it.imei == imei.toString() }?.vehicleNumber
-                                            ?: ""
-                                    )
+                                    it.data.data.find { selectedVehicle.value.text == it.deviceName }
+                                        ?.let { it1 ->
+                                            mapViewModel.setValueInPref(
+                                                "imei",
+                                                it1.imei
+                                            )
+                                        }
+                                    createPolyline()
+
                                 }
 
                                 is Response.Error -> {
@@ -123,7 +195,6 @@ fun HomeScreen(
                     }
 
                     false -> {
-                        Log.d("TAG", "getDeviceList: $it")
                         showLoadingScreen = false
                         Toast.makeText(context, "Server down", Toast.LENGTH_LONG)
                             .show()
@@ -140,6 +211,8 @@ fun HomeScreen(
                 is Response.Success -> {
                     lat.value = it.data.lat
                     lng.value = it.data.lng
+                    mapViewModel.setValueInPref("lat", it.data.lat)
+                    mapViewModel.setValueInPref("lng", it.data.lng)
                 }
 
                 is Response.Error -> {
@@ -149,72 +222,104 @@ fun HomeScreen(
         }
     }
 
+    val name = remember {
+        mutableStateOf("")
+    }
+
+    var phoneNumber = remember {
+        mutableStateOf("")
+    }
+
+    val firmName = remember {
+        mutableStateOf("")
+    }
+
+    fun onVehicleChange(vehicleNumber: String) {
+        val imei = vehicleList.find { vehicleNumber == it.vehicleNumber }?.imei ?: ""
+        mapViewModel.setValueInPref("imei", imei)
+    }
+
+    fun onLogoutClick() {
+        mapViewModel.setValueInPref("appid", "")
+        mapViewModel.setValueInPref("signature", "")
+        mapViewModel.setValueInPref("imei", "")
+        authRedirect()
+    }
+
     LaunchedEffect(Unit) {
 
-        val appid = mapViewModel.getValueFromPref("appid")
+        val appId = mapViewModel.getValueFromPref("appId")
         val signature = mapViewModel.getValueFromPref("signature")
-        val imei = mapViewModel.getValueFromPref("imei")
+        selectedVehicle.value =
+            TextFieldValue(mapViewModel.getValueFromPref("vehicleNumber").toString())
+        name.value = mapViewModel.getValueFromPref("name").toString()
+        phoneNumber.value = mapViewModel.getValueFromPref("number").toString()
+        firmName.value = mapViewModel.getValueFromPref("firmName").toString()
 
-        Log.d("TAG", "HomeScreen: $appid")
-        Log.d("TAG", "HomeScreen: $signature")
-        Log.d("TAG", "HomeScreen: $imei")
+//        Log.d("TAG", "HomeScreen: $signature")
+//        Log.d("TAG", "HomeScreen: $imei")
 
-        if (appid.isNullOrBlank() || signature.isNullOrBlank() || imei.isNullOrBlank()) {
+        if (appId.isNullOrBlank() || signature.isNullOrBlank()) {
             authRedirect()
         } else {
-            getDeviceList(appid, signature, imei)
+            getDeviceList(appId, signature)
 
-            while (!showPlaybackBox.value) {
+            while (selectedScreen.value == 1) {
                 delay(2000)
                 getLiveLocation()
             }
         }
     }
 
+
+
     Scaffold(
         topBar = {
             TopBar(
                 drawerState = drawerState,
                 value = selectedVehicle.value.text,
-                onValueChange = { selectedVehicle.value = TextFieldValue(it) },
-                options = vehicleList.map { it.vehicleNumber }
+                onValueChange = {
+                    selectedVehicle.value = TextFieldValue(it)
+                    onVehicleChange(it)
+                },
+                options = vehicleList.map { it.vehicleNumber },
+                selectedScreen = selectedScreen
             )
         },
 
         bottomBar = {
-            BottomBar()
+            BottomBar(selectedScreen)
         },
 
         containerColor = Color.White,
 
-        floatingActionButton = {
-            if (!showPlaybackBox.value) {
-                IconButton(
-                    onClick = {
-                        showPlaybackBox.value = true
-
-                    },
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .background(PrimaryGreen, CircleShape)
-                        .padding(5.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.History,
-                        contentDescription = "",
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
-            }
-        },
-
-        floatingActionButtonPosition = FabPosition.End
-    ) {
+        ) {
         Column(modifier = Modifier.padding(it)) {
-            MapViewer(lat.value.toDouble(), lng.value.toDouble(), playbackLatLng)
+
+            if (selectedScreen.value == 1) {
+                isPlaybackStarted.value = false
+            }
+
+            if (selectedScreen.value == 2) {
+                PlaybackScreen(
+                    playbackLatLngList = playbackLatLngList,
+                    isPlaybackStarted = isPlaybackStarted,
+                    activeSpeedButton = activeSpeedButton,
+                    initiallySelectedVehicle = selectedVehicle.value.text,
+                    vehicleList = vehicleList
+                )
+            }
+
+            MapViewer(
+                lat = lat.value.toDouble(),
+                lng = lng.value.toDouble(),
+                playbackLatLngList = playbackLatLngList,
+                isPlaybackStarted = isPlaybackStarted,
+                activeSpeedButton = activeSpeedButton,
+                carIcon = carIcon
+            )
         }
 
-        if (showPlaybackBox.value) PlaybackBox(showPlaybackBox = showPlaybackBox)
     }
 
     if (showLoadingScreen) {
@@ -222,49 +327,14 @@ fun HomeScreen(
     }
 
     if (drawerState.value) {
-        NavigationDrawer(onCloseClick = { drawerState.value = false })
+        NavigationDrawer(
+            onCloseClick = { drawerState.value = false },
+            name = name,
+            phoneNumber = phoneNumber,
+            firmName = firmName,
+            onLogoutClick = { onLogoutClick() }
+        )
     }
 }
 
-@Composable
-fun MapViewer(lat: Double, lng: Double, playbackLatLng: List<Info>) {
-    val mapplsMapState = remember { mutableStateOf<MapplsMap?>(null) }
-    var currentIndex by remember { mutableStateOf(0) }
 
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { context ->
-            MapView(context).apply {
-                getMapAsync(object : OnMapReadyCallback {
-                    override fun onMapReady(mapplsMap: MapplsMap) {
-                        mapplsMapState.value = mapplsMap
-                        val initialPosition = LatLng(lat, lng)
-                        mapplsMap.addMarker(MarkerOptions().position(initialPosition))
-
-                        val cameraPosition =
-                            CameraPosition.Builder().target(initialPosition).zoom(15.0).tilt(0.0)
-                                .build()
-                        mapplsMap.cameraPosition = cameraPosition
-                    }
-
-                    override fun onMapError(p0: Int, p1: String?) {
-                        Toast.makeText(
-                            context,
-                            "Something went wrong. Please restart the app",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                })
-            }
-        },
-        update = {
-            mapplsMapState.value?.let { mapplsMap ->
-                mapplsMap.clear()
-                mapplsMap.addMarker(MarkerOptions().position(LatLng(lat, lng)))
-                mapplsMap.cameraPosition =
-                    CameraPosition.Builder().target(LatLng(lat, lng)).zoom(15.0).tilt(0.0).build()
-            }
-
-        }
-    )
-}

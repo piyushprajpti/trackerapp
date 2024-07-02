@@ -1,6 +1,8 @@
 package com.example.trackerapp.presentation.home
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,14 +22,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.trackerapp.ui.theme.PrimaryGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VehicleDropDownList(
     value: String,
     onValueChange: (String) -> Unit,
-    options: List<String>
+    options: List<String>,
+    isPlaybackScreen: Boolean
 ) {
     var expended by remember {
         mutableStateOf(false)
@@ -40,7 +45,8 @@ fun VehicleDropDownList(
         InputField(
             modifier = Modifier.menuAnchor(),
             value = TextFieldValue(value),
-            expended = expended
+            expended = expended,
+            isPlaybackScreen = isPlaybackScreen
         )
 
         DropdownMenu(
@@ -69,8 +75,15 @@ fun VehicleDropDownList(
 private fun InputField(
     modifier: Modifier = Modifier,
     value: TextFieldValue,
-    expended: Boolean = false
+    expended: Boolean = false,
+    isPlaybackScreen: Boolean
 ) {
+    val borderModifier = if (isPlaybackScreen) {
+        Modifier.border(0.5.dp, PrimaryGreen, RoundedCornerShape(4.dp))
+    } else {
+        Modifier
+    }
+
     TextField(
         value = value,
 
@@ -80,16 +93,17 @@ private fun InputField(
 
         readOnly = true,
 
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().then(borderModifier),
 
         textStyle = TextStyle(
             fontSize = 18.sp,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Normal,
+            color = if (isPlaybackScreen) Color.Gray else Color.White
         ),
 
         colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color(0x1AFFFFFF),
+            focusedContainerColor = Color(0x1AFFFFFF),
             unfocusedLabelColor = Color.LightGray,
             focusedLabelColor = Color.White,
             unfocusedIndicatorColor = Color.Transparent,

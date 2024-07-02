@@ -10,6 +10,7 @@ import com.example.trackerapp.domain.repository.MapRepository
 import com.example.trackerapp.domain.service.MapService
 import com.example.trackerapp.util.Response
 import io.ktor.client.call.body
+import io.ktor.client.statement.bodyAsText
 
 class MapRepositoryImpl(
     private val service: MapService
@@ -65,6 +66,7 @@ class MapRepositoryImpl(
     ): Response<HistoryPlaybackResponse> {
         try {
             val response = service.getHistoryPlayback(accessToken, imei, startTime, endTime)
+//            Log.d("TAG", "getHistoryPlayback: ${response.bodyAsText()}")
             return Response.Success(response.body())
         } catch (e: Exception) {
             Log.d("TAG", "getHistoryPlayback: $e")

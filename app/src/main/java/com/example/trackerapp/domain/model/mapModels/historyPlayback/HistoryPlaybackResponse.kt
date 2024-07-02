@@ -13,11 +13,11 @@ data class HistoryPlaybackResponse(
     val result: String = "",
 
     @SerialName("data")
-    val info: List<Info> = emptyList()
+    val playbackLatLngList: List<PlaybackLatLngList> = emptyList()
 )
 
 @Serializable
-data class Info (
+data class PlaybackLatLngList (
 
     @SerialName("code")
     val code: Int,

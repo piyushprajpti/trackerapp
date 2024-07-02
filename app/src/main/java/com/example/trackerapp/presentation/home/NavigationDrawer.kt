@@ -20,12 +20,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trackerapp.ui.theme.PrimaryGreen
 
 @Composable
 fun NavigationDrawer(
-    onCloseClick: () -> Unit
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    onCloseClick: () -> Unit,
+    name: MutableState<String>,
+    phoneNumber: MutableState<String>,
+    firmName: MutableState<String>,
+    onLogoutClick: () -> Unit
 ) {
+
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -51,23 +58,62 @@ fun NavigationDrawer(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            Text(
-                text = "Name - Piyush Prajapati",
-                fontSize = 16.sp
+            InfoBox(
+                title = "Name",
+                description = name.value
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Text(
-                text = "Number - 7014986896",
-                fontSize = 16.sp
+            InfoBox(
+                title = "Number",
+                description = phoneNumber.value
             )
 
+            Spacer(modifier = Modifier.height(10.dp))
+
+            InfoBox(
+                title = "Firm Name",
+                description = firmName.value
+            )
+
+            Spacer(modifier = Modifier.height(70.dp))
+
+
+            Text(
+                text = "Log Out →",
+                color = Color.Red,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable {onLogoutClick()}
+            )
         }
+
 
         Box(modifier = Modifier
             .fillMaxSize()
-            .clickable { onCloseClick() })
+            .clickable { onCloseClick() }
+        )
+    }
+}
 
+@Composable
+fun InfoBox(
+    title: String,
+    description: String
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "$title  -  ",
+            fontSize = 16.sp,
+            color = PrimaryGreen,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = description,
+            fontSize = 16.sp,
+            color = Color.DarkGray
+        )
     }
 }

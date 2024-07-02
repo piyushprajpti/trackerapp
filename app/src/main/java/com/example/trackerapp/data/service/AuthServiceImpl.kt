@@ -1,14 +1,17 @@
 package com.example.trackerapp.data.service
 
-import com.example.trackerapp.domain.model.authModels.LoginRequest
-import com.example.trackerapp.domain.model.authModels.OtpRequest
+import android.util.Log
 import com.example.trackerapp.domain.model.authModels.RegisterRequest
+import com.example.trackerapp.domain.model.authModels.SendOtpRequest
+import com.example.trackerapp.domain.model.authModels.VerifyOtpRequest
 import com.example.trackerapp.domain.service.AuthService
+import com.example.trackerapp.util.BackendUrl
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
@@ -17,17 +20,21 @@ class AuthServiceImpl(
 ) : AuthService {
 
     override suspend fun sendOTP(number: String): HttpResponse {
-        val response = client.post("https://vehicle-tracking-gu26.onrender.com/api/v1/auth/signup") {
+        val response =
+            client.post("$BackendUrl/signup") {
                 contentType(ContentType.Application.Json)
-                setBody(LoginRequest(number))
+                setBody(SendOtpRequest(number))
             }
+//        Log.d("TAG", "sendOTP: ${response.bodyAsText()}")
+//        Log.d("TAG", "sendOTP: response")
         return response
     }
 
     override suspend fun verifyOTP(number: String, otp: String): HttpResponse {
-        val response = client.post("https://vehicle-tracking-gu26.onrender.com/api/v1/auth/otp/verify") {
+        val response =
+            client.post("$BackendUrl/otp/verify") {
                 contentType(ContentType.Application.Json)
-                setBody(OtpRequest(number, otp))
+                setBody(VerifyOtpRequest(number, otp))
             }
         return response
     }
@@ -36,17 +43,23 @@ class AuthServiceImpl(
         number: String,
         name: String,
         firmName: String,
+        appId: String,
+        signature: String,
         vehicleNumber: String
     ): HttpResponse {
-        val response = client.post("https://vehicle-trackingnpm-run-server.onrender.com/api/v1/auth/registration") {
-            contentType(ContentType.Application.Json)
-            setBody(RegisterRequest(number, name, firmName, vehicleNumber))
-        }
+        val response =
+            client.post("$BackendUrl/registration") {
+                contentType(ContentType.Application.Json)
+                setBody(RegisterRequest(number, name, firmName, appId, signature, vehicleNumber))
+            }
+
+//        Log.d("TAG", "registerUser service: ${response.bodyAsText()}")
         return response
     }
 
     override suspend fun getFirmList(): HttpResponse {
-        val response = client.get("https://vehicle-tracking-gu26.onrender.com/api/v1/auth/getIdAllFirm")
+        val response =
+            client.get("$BackendUrl/getIdAllFirm")
         return response
     }
 

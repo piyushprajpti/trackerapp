@@ -1,5 +1,8 @@
 package com.example.trackerapp.domain.repository
 
-interface HomeRepository {
+import com.example.trackerapp.domain.model.homeModels.GetUserInfoResponse
+import com.example.trackerapp.util.Response
 
+interface HomeRepository {
+    suspend fun getUserInfo(number: String): Response<GetUserInfoResponse>
 }
