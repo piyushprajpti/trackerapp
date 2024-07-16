@@ -11,38 +11,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trackerapp.R
 import com.example.trackerapp.domain.model.mapModels.deviceList.VehicleList
 import com.example.trackerapp.domain.model.mapModels.historyPlayback.PlaybackLatLngList
 import com.example.trackerapp.presentation.map.MapViewModel
 import com.example.trackerapp.presentation.map.MapViewer
-import com.example.trackerapp.ui.theme.PrimaryOrange
 import com.example.trackerapp.util.LoadingScreen
 import com.example.trackerapp.util.Response
-import com.mappls.sdk.maps.MapView
-import com.mappls.sdk.maps.MapplsMap
-import com.mappls.sdk.maps.OnMapReadyCallback
-import com.mappls.sdk.maps.annotations.Icon
 import com.mappls.sdk.maps.annotations.IconFactory
-import com.mappls.sdk.maps.annotations.MarkerOptions
-import com.mappls.sdk.maps.annotations.PolylineOptions
-import com.mappls.sdk.maps.camera.CameraPosition
-import com.mappls.sdk.maps.geometry.LatLng
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -67,6 +53,10 @@ fun HomeScreen(
 
     val selectedVehicle = remember {
         mutableStateOf(TextFieldValue(""))
+    }
+
+    val toggle = remember {
+        mutableStateOf(false)
     }
 
     var showLoadingScreen by remember {
@@ -97,33 +87,41 @@ fun HomeScreen(
         mutableStateOf<List<PlaybackLatLngList>>(emptyList())
     }
 
-    fun createPolyline() {
+    fun createPolyline(startTime: Long? = null, endTime: Long? = null) {
 
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
+        val currentStartTime: Long
+        val currentEndTime: Long
 
-        val endTime = calendar.timeInMillis / 1000
+        if (startTime == null || endTime == null) {
 
-        calendar.add(Calendar.DAY_OF_YEAR, -1)
-        val startTime = calendar.timeInMillis / 1000
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+
+            currentEndTime = calendar.timeInMillis / 1000
+
+            calendar.add(Calendar.DAY_OF_YEAR, -1)
+            currentStartTime = calendar.timeInMillis / 1000
+        } else {
+            currentStartTime = startTime
+            currentEndTime = endTime
+        }
 
         mapViewModel.getHistoryPlayback(
             imei = vehicleList.find { selectedVehicle.value.text == it.vehicleNumber }?.imei
                 ?: "",
-            startTime = startTime,
-            endTime = endTime,
+            startTime = currentStartTime,
+            endTime = currentEndTime,
             callBack = {
                 when (it) {
                     is Response.Success -> {
                         if (it.data.playbackLatLngList.isEmpty()) {
-                            Toast.makeText(
-                                context,
-                                "No vehicle movement records found in last 24 hours",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            createPolyline(
+                                startTime = currentStartTime - 86400,
+                                endTime = currentEndTime - 86400
+                            )
                         } else {
                             playbackLatLngList.value = it.data.playbackLatLngList.map {
                                 PlaybackLatLngList(
@@ -141,6 +139,7 @@ fun HomeScreen(
                     }
 
                     is Response.Error -> {
+                        Log.d("TAG", "createPolyline: ${it.error}")
                         Toast.makeText(
                             context,
                             "Unable to draw polyline",
@@ -179,7 +178,6 @@ fun HomeScreen(
                                             )
                                         }
                                     createPolyline()
-
                                 }
 
                                 is Response.Error -> {
@@ -226,12 +224,16 @@ fun HomeScreen(
         mutableStateOf("")
     }
 
-    var phoneNumber = remember {
+    val phoneNumber = remember {
         mutableStateOf("")
     }
 
     val firmName = remember {
         mutableStateOf("")
+    }
+
+    val currentSpeed = remember {
+        mutableStateOf(0)
     }
 
     fun onVehicleChange(vehicleNumber: String) {
@@ -256,9 +258,6 @@ fun HomeScreen(
         phoneNumber.value = mapViewModel.getValueFromPref("number").toString()
         firmName.value = mapViewModel.getValueFromPref("firmName").toString()
 
-//        Log.d("TAG", "HomeScreen: $signature")
-//        Log.d("TAG", "HomeScreen: $imei")
-
         if (appId.isNullOrBlank() || signature.isNullOrBlank()) {
             authRedirect()
         } else {
@@ -271,7 +270,11 @@ fun HomeScreen(
         }
     }
 
-
+    LaunchedEffect(selectedScreen.value) {
+        if (toggle.value) {
+            createPolyline()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -301,12 +304,14 @@ fun HomeScreen(
             }
 
             if (selectedScreen.value == 2) {
+                toggle.value = true
                 PlaybackScreen(
                     playbackLatLngList = playbackLatLngList,
                     isPlaybackStarted = isPlaybackStarted,
                     activeSpeedButton = activeSpeedButton,
                     initiallySelectedVehicle = selectedVehicle.value.text,
-                    vehicleList = vehicleList
+                    vehicleList = vehicleList,
+                    currentSpeed = currentSpeed
                 )
             }
 
@@ -316,7 +321,8 @@ fun HomeScreen(
                 playbackLatLngList = playbackLatLngList,
                 isPlaybackStarted = isPlaybackStarted,
                 activeSpeedButton = activeSpeedButton,
-                carIcon = carIcon
+                carIcon = carIcon,
+                currentSpeed = currentSpeed
             )
         }
 

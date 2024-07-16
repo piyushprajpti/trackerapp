@@ -35,7 +35,7 @@ data class PlaybackLatLngList (
     val speed: Int,
 
     @SerialName("course")
-    val course: Int,
+    val course: Long = 0,
 
     @SerialName("gpsTime")
     val gpsTime: Int,

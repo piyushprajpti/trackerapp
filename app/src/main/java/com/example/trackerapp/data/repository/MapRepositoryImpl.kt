@@ -66,11 +66,9 @@ class MapRepositoryImpl(
     ): Response<HistoryPlaybackResponse> {
         try {
             val response = service.getHistoryPlayback(accessToken, imei, startTime, endTime)
-//            Log.d("TAG", "getHistoryPlayback: ${response.bodyAsText()}")
             return Response.Success(response.body())
         } catch (e: Exception) {
-            Log.d("TAG", "getHistoryPlayback: $e")
-            return Response.Error("Something went wrong. Please try again.")
+            return Response.Error(e.message.toString())
         }
     }
 

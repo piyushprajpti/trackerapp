@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +33,8 @@ fun MapViewer(
     playbackLatLngList: MutableState<List<PlaybackLatLngList>>,
     isPlaybackStarted: MutableState<Boolean>,
     activeSpeedButton: MutableState<Int>,
-    carIcon: Icon
+    carIcon: Icon,
+    currentSpeed: MutableState<Int>
 ) {
     val mapplsMapState = remember { mutableStateOf<MapplsMap?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -81,7 +83,8 @@ fun MapViewer(
                             playbackLatLngList = playbackLatLngList.value,
                             activeSpeedButton = activeSpeedButton,
                             isPlaybackStarted = isPlaybackStarted,
-                            carIcon = carIcon
+                            carIcon = carIcon,
+                            currentSpeed = currentSpeed
                         )
                     }
                 } else if (dataFetched.value) {
@@ -107,7 +110,8 @@ suspend fun animatePolyline(
     playbackLatLngList: List<PlaybackLatLngList>,
     activeSpeedButton: MutableState<Int>,
     isPlaybackStarted: MutableState<Boolean>,
-    carIcon: Icon
+    carIcon: Icon,
+    currentSpeed: MutableState<Int>
 ) {
     mapplsMap.clear()
     if (playbackLatLngList.isNotEmpty()) {
@@ -133,7 +137,7 @@ suspend fun animatePolyline(
                 playbackLatLngList[i].lat.toDouble(),
                 playbackLatLngList[i].lng.toDouble()
             )
-
+            currentSpeed.value = playbackLatLngList[i].speed
             // Update the polyline with the new point
             polylineOptions.add(latLng)
             mapplsMap.addPolyline(polylineOptions)

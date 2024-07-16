@@ -1,6 +1,7 @@
 package com.example.trackerapp.presentation.home
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -29,16 +30,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,7 +49,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.trackerapp.domain.model.mapModels.deviceList.VehicleList
 import com.example.trackerapp.domain.model.mapModels.historyPlayback.PlaybackLatLngList
-import com.example.trackerapp.presentation.common.CommonViewModel
 import com.example.trackerapp.presentation.map.MapViewModel
 import com.example.trackerapp.ui.theme.PrimaryGreen
 import com.example.trackerapp.util.DateUtils
@@ -68,6 +66,7 @@ fun PlaybackScreen(
     activeSpeedButton: MutableState<Int>,
     initiallySelectedVehicle: String,
     vehicleList: List<VehicleList>,
+    currentSpeed: MutableState<Int>,
     mapViewModel: MapViewModel = hiltViewModel()
 ) {
 
@@ -184,6 +183,12 @@ fun PlaybackScreen(
         mutableStateOf(false)
     }
 
+    val maxSpeed = remember {
+        mutableStateOf(0)
+    }
+
+    if (maxSpeed.value < currentSpeed.value) maxSpeed.value = currentSpeed.value
+
     val context = LocalContext.current
 
     fun onPlayClick() {
@@ -246,6 +251,7 @@ fun PlaybackScreen(
                         }
 
                         is Response.Error -> {
+                            Log.d("TAG", "onPlayClick: ${it.error}")
                             Toast.makeText(
                                 context,
                                 "Unable to start playback. Please try again",
@@ -263,9 +269,9 @@ fun PlaybackScreen(
 
     Column(
         modifier = Modifier
-            .background(Color.White)
+            .background(Color.Transparent)
             .then(screenSizeModifier)
-            .padding(12.dp)
+            .padding(start = 10.dp, top = 10.dp, end = 10.dp, bottom = 5.dp)
     ) {
 
         if (isLoading.value) {
@@ -429,58 +435,109 @@ fun PlaybackScreen(
         } else {
 
             // after play click
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Row {
-                    SpeedButton(
-                        text = "1X",
-                        isActive = activeSpeedButton.value == 1,
-                        onClick = {
-                            activeSpeedButton.value = 1
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    SpeedButton(
-                        text = "2X",
-                        isActive = activeSpeedButton.value == 2,
-                        onClick = {
-                            activeSpeedButton.value = 2
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    SpeedButton(
-                        text = "5X",
-                        isActive = activeSpeedButton.value == 5,
-                        onClick = {
-                            activeSpeedButton.value = 5
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    SpeedButton(
-                        text = "10X",
-                        isActive = activeSpeedButton.value == 10,
-                        onClick = {
-                            activeSpeedButton.value = 10
-                        }
-                    )
-                }
-
-                TextButton(
-                    onClick = {
-                        isPlaybackStarted.value = false
-                    },
-                    modifier = Modifier.background(Color.Red, RoundedCornerShape(14.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "STOP", color = Color.White, fontSize = 20.sp)
+                    Row {
+                        SpeedButton(
+                            text = "1X",
+                            isActive = activeSpeedButton.value == 1,
+                            onClick = {
+                                activeSpeedButton.value = 1
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        SpeedButton(
+                            text = "2X",
+                            isActive = activeSpeedButton.value == 2,
+                            onClick = {
+                                activeSpeedButton.value = 2
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        SpeedButton(
+                            text = "5X",
+                            isActive = activeSpeedButton.value == 5,
+                            onClick = {
+                                activeSpeedButton.value = 5
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        SpeedButton(
+                            text = "10X",
+                            isActive = activeSpeedButton.value == 10,
+                            onClick = {
+                                activeSpeedButton.value = 10
+                            }
+                        )
+                    }
+
+                    TextButton(
+                        onClick = {
+                            isPlaybackStarted.value = false
+                        },
+                        modifier = Modifier.background(Color.Red, RoundedCornerShape(14.dp))
+                    ) {
+                        Text(text = "STOP", color = Color.White, fontSize = 20.sp)
+                    }
+                }
+                HorizontalDivider(
+                    color = Color(0xFFECECEC),
+                    modifier = Modifier.padding(top = 10.dp, bottom = 2.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Row(
+
+                    ) {
+                        Text(
+                            text = "Current Speed: ",
+                            color = Color.DarkGray,
+                            fontSize = 13.sp
+                        )
+                        Text(
+                            text = currentSpeed.value.toString(),
+                            color = PrimaryGreen,
+                            fontSize = 16.sp
+                        )
+                        Text(text = " Km/Hr", color = Color.DarkGray, fontSize = 13.sp)
+                    }
+                    VerticalDivider(modifier = Modifier.height(15.dp), color = Color(0xFFB8B8B8))
+                    Row(
+
+                    ) {
+                        Text(
+                            text = "Max Speed: ",
+                            color = Color.DarkGray,
+                            fontSize = 13.sp
+                        )
+                        Text(
+                            text = maxSpeed.value.toString(),
+                            color = PrimaryGreen,
+                            fontSize = 16.sp
+                        )
+                        Text(text = " Km/Hr", color = Color.DarkGray, fontSize = 13.sp)
+                    }
                 }
             }
         }

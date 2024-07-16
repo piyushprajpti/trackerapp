@@ -1,5 +1,6 @@
 package com.example.trackerapp.presentation.auth
 
+import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -58,7 +59,7 @@ class AuthViewModel @Inject constructor(
                 signature,
                 vehicleNumber
             )
-
+            Log.d("TAG", "onRegisterUser: $response")
             if (response is Response.Success) {
                 setValueInPref("name", name)
                 setValueInPref("firmName", firmName)

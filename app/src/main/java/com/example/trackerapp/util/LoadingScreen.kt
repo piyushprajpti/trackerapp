@@ -44,8 +44,6 @@ fun LoadingScreen() {
     ) {
         Box(
             modifier = Modifier.padding(20.dp)
-//                .background(Color(0x0C000000), RoundedCornerShape(12.dp))
-//                .border(1.dp, Color(0x20000000),RoundedCornerShape(12.dp))
         ) {
             CircularProgressIndicator(
                 modifier = Modifier
