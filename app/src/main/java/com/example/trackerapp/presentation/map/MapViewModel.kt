@@ -1,6 +1,5 @@
 package com.example.trackerapp.presentation.map
 
-import android.util.Log
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +30,10 @@ class MapViewModel @Inject constructor(
 
             if (response is Response.Success) {
                 if (response.data.code == 0) {
-                    setValueInPref("access_token", response.data.accessToken)
+                    dataStoreRepository.setValue(
+                        stringPreferencesKey("access_token"),
+                        response.data.accessToken
+                    )
                     callBack(true)
                 } else if (response.data.code == 10004) {
                     callBack(false)

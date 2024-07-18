@@ -56,6 +56,7 @@ import com.example.trackerapp.util.LoadingScreen
 import com.example.trackerapp.util.Response
 import com.example.trackerapp.util.TimePickerDialog
 import com.example.trackerapp.util.convertTo12HourFormat
+import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,10 +126,15 @@ fun PlaybackScreen(
     }
 
 
+    val calender = Calendar.getInstance()
+    val currentHour = calender.get(Calendar.HOUR_OF_DAY)
+    val currentMinute = calender.get(Calendar.MINUTE)
+
+
     val startTimeState =
-        rememberTimePickerState(initialHour = 12, initialMinute = 12)
+        rememberTimePickerState(initialHour = 0, initialMinute = 0)
     val endTimeState =
-        rememberTimePickerState(initialHour = 12, initialMinute = 12)
+        rememberTimePickerState(initialHour = currentHour, initialMinute = currentMinute)
 
     val showTimePickerBox = remember {
         mutableStateOf(false)
@@ -192,13 +198,14 @@ fun PlaybackScreen(
     val context = LocalContext.current
 
     fun onPlayClick() {
+
         val startDateMillis = startDateState.selectedDateMillis ?: System.currentTimeMillis()
         val startMillis =
-            (startDateMillis / 1000) + (startTimeState.hour * 3600) + (startTimeState.minute * 3600)
+            (startDateMillis / 1000) + (startTimeState.hour * 3600) + (startTimeState.minute * 60) - 19800
 
         val endDateMillis = endDateState.selectedDateMillis ?: System.currentTimeMillis()
         val endMillis =
-            (endDateMillis / 1000) + (endTimeState.hour * 3600) + (endTimeState.minute * 3600)
+            (endDateMillis / 1000) + (endTimeState.hour * 3600) + (endTimeState.minute * 60) - 19800
 
         if (startMillis > endMillis) {
             Toast.makeText(context, "Start time can't be greater than end time", Toast.LENGTH_LONG)
@@ -251,7 +258,6 @@ fun PlaybackScreen(
                         }
 
                         is Response.Error -> {
-                            Log.d("TAG", "onPlayClick: ${it.error}")
                             Toast.makeText(
                                 context,
                                 "Unable to start playback. Please try again",
@@ -508,35 +514,35 @@ fun PlaybackScreen(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Row(
-
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
                             text = "Current Speed: ",
                             color = Color.DarkGray,
-                            fontSize = 13.sp
+                            fontSize = 12.sp
                         )
                         Text(
                             text = currentSpeed.value.toString(),
                             color = PrimaryGreen,
                             fontSize = 16.sp
                         )
-                        Text(text = " Km/Hr", color = Color.DarkGray, fontSize = 13.sp)
+                        Text(text = " km/h", color = Color.DarkGray, fontSize = 12.sp)
                     }
                     VerticalDivider(modifier = Modifier.height(15.dp), color = Color(0xFFB8B8B8))
                     Row(
-
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
                             text = "Max Speed: ",
                             color = Color.DarkGray,
-                            fontSize = 13.sp
+                            fontSize = 12.sp
                         )
                         Text(
                             text = maxSpeed.value.toString(),
                             color = PrimaryGreen,
                             fontSize = 16.sp
                         )
-                        Text(text = " Km/Hr", color = Color.DarkGray, fontSize = 13.sp)
+                        Text(text = " km/h", color = Color.DarkGray, fontSize = 12.sp)
                     }
                 }
             }
