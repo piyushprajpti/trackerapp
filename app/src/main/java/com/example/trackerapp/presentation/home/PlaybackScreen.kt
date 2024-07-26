@@ -462,7 +462,7 @@ fun PlaybackScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(15.dp))
 
                         SpeedButton(
                             text = "2X",
@@ -472,7 +472,7 @@ fun PlaybackScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(15.dp))
 
                         SpeedButton(
                             text = "5X",
@@ -482,15 +482,15 @@ fun PlaybackScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        SpeedButton(
-                            text = "10X",
-                            isActive = activeSpeedButton.value == 10,
-                            onClick = {
-                                activeSpeedButton.value = 10
-                            }
-                        )
+//                        Spacer(modifier = Modifier.width(8.dp))
+//
+//                        SpeedButton(
+//                            text = "10X",
+//                            isActive = activeSpeedButton.value == 10,
+//                            onClick = {
+//                                activeSpeedButton.value = 10
+//                            }
+//                        )
                     }
 
                     TextButton(

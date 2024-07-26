@@ -44,7 +44,7 @@ fun HomeScreen(
     val context = LocalContext.current
 
     val carIcon = remember {
-        IconFactory.getInstance(context).fromResource(R.drawable.car)
+        IconFactory.getInstance(context).fromResource(R.drawable.car2)
     }
 
     var vehicleList by remember {

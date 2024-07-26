@@ -97,6 +97,7 @@ dependencies {
     // mappls
     implementation (libs.mappls.andoid.sdk)
     implementation (libs.intouch.sdk)
+    implementation(libs.direction.ui)
 
     // datastore
     implementation(libs.androidx.datastore.preferences)
@@ -105,5 +106,4 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.fragment.ktx)
-    implementation (libs.direction.ui)
 }
